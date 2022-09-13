@@ -98,12 +98,14 @@ class Parser extends Init {
 	 * @return string
 	 */
 	public function set_new_topic_querystring( $qs ) {
+		bp_rbe_log( 'set_new_topic_querystring $qs: ' . $qs );
 		$prefix = Get::mailbox_prefix();
 		if ( ! empty( $prefix ) && 0 !== strpos( $qs, $prefix ) ) {
 			return $qs;
 		}
 
-		$mailbox  = ! empty( $prefix ) ? str_replace( $prefix, '', $qs ) : $qs;
+		$mailbox = substr( $qs, strlen( $prefix) );
+		bp_rbe_log( 'set_new_topic_querystring $mailbox: ' . $mailbox );
 		$group_id = $forum_id = 0;
 
 		// Check if a group has a customized mailbox.
@@ -124,14 +126,17 @@ class Parser extends Init {
 		// Fallback to group slug check.
 		} else {
 			$group_id = BP_Groups_Group::group_exists( $mailbox );
+			bp_rbe_log( 'set_new_topic_querystring $group_id: ' . var_export( $group_id, true) );
 	
 			if ( is_null( $group_id ) ) {
+				bp_rbe_log( 'set_new_topic_querystring $group_id null' );
 				return $qs;
 			}
 		}
 
 		// No group, so bail.
 		if ( empty( $group_id ) ) {
+			bp_rbe_log( 'set_new_topic_querystring $group_id empty' );
 			return $qs;
 		}
 
@@ -143,6 +148,7 @@ class Parser extends Init {
 
 		// No forum attached to group, so bail.
 		if ( empty( $forum_id ) ) {
+			bp_rbe_log( 'set_new_topic_querystring $forum_id empty' );
 			return $qs;
 		}
 
@@ -152,6 +158,7 @@ class Parser extends Init {
 			'bbpf' => $forum_id
 		);
 
+		bp_rbe_log( 'set_new_topic_querystring $params' . var_export( $params, true ) );
 		return http_build_query( $params );
 	}
 }
