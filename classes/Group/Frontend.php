@@ -73,7 +73,12 @@ class Frontend extends Init {
 		}
 
 		if ( bp_rbe_is_inbound() ) {
-			$retval = str_replace( '-new', '', $retval );
+			// Remove '-new' from end of inbox address if it exists.
+			[ $inbox, $domain ] = explode( '@', $retval );
+			if ( substr( $inbox, -4 ) === '-new' ) {
+				$inbox = substr( $inbox, 0, -4 );
+			}
+			$retval = "$inbox@$domain";
 		} else {
 			$retval = Get::mailbox_prefix() . Get::mailbox() . '@' . bp_rbe_get_setting( 'inbound-domain' );
 		}
